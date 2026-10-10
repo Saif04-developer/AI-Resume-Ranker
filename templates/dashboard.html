@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Ranker</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>AI-Based Resume Ranker</h1>
+
+        <p class="subtitle">
+            Resume Ranking and Job Matching System
+        </p>
+
+        <div class="card">
+
+            <h2>Job Description</h2>
+
+            <form action="/add-job" method="POST">
+
+                <div class="card">
+
+                    <h2>Job Description</h2>
+
+                    <input type="text" name="title" placeholder="Enter job title..." required>
+
+                    <textarea name="description" placeholder="Enter or paste the job description here..."
+                        required></textarea>
+
+                </div>
+
+                <button type="submit">
+                    Save Job
+                </button>
+
+            </form>
+
+        </div>
+
+        <form action="/upload-resumes" method="POST" enctype="multipart/form-data">
+
+            <div class="card">
+
+                <h2>Upload Resumes</h2>
+
+                <input type="file" name="resumes" multiple accept=".pdf" required>
+
+            </div>
+
+            <button type="submit">
+                Upload Resumes
+            </button>
+
+        </form>
+
+        <button>
+            Analyze Resumes
+        </button>
+
+    </div>
+
+</body>
+
+</html>
