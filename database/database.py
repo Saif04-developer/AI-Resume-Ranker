@@ -55,3 +55,28 @@ def add_job(title, job_description):
 
     connection.commit()
     connection.close()
+
+def add_candidate(name, resume_filename, resume_text):
+    connection = get_connection()
+
+    connection.execute(
+        """
+        INSERT INTO candidates (name, resume_filename, resume_text)
+        VALUES (?, ?, ?)
+        """,
+        (name, resume_filename, resume_text)
+    )
+
+    connection.commit()
+    connection.close()
+
+def get_candidates():
+    connection = get_connection()
+
+    candidates = connection.execute(
+        "SELECT id, name, resume_filename FROM candidates ORDER BY id DESC"
+    ).fetchall()
+
+    connection.close()
+
+    return candidates
