@@ -1,103 +1,617 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AI Resume Ranker</title>
+    <title>AI Resume Ranker | Dashboard</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
+<div class="app-layout">
 
-    <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <div class="brand-icon">AI</div>
+            <div>
+                <h2>ResumeRank</h2>
+                <span>INTELLIGENT HIRING</span>
+            </div>
+        </a>
 
-        <h1>AI-Based Resume Ranker</h1>
+        <div class="sidebar-label">WORKSPACE</div>
 
-        <p class="subtitle">
-            Resume Ranking and Job Matching System
-        </p>
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-link active">
+                <span class="nav-icon">&#9632;</span>
+                Dashboard
+            </a>
 
-        <div class="card">
+            <a href="#add-job" class="nav-link">
+                <span class="nav-icon">+</span>
+                Job Descriptions
+            </a>
 
-            <h2>Job Description</h2>
+            <a href="#upload-resumes" class="nav-link">
+                <span class="nav-icon">&#8593;</span>
+                Upload Resumes
+            </a>
 
-            <form action="/add-job" method="POST">
+            <a href="#ranked-candidates" class="nav-link">
+                <span class="nav-icon">&#9776;</span>
+                Candidate Rankings
+            </a>
+        </nav>
 
-                <div class="card">
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-icon">&#10022;</div>
+            <div>
+                <strong>AI-Powered Matching</strong>
+                <p>Find the right talent faster.</p>
+            </div>
+        </div>
+    </aside>
 
-                    <h2>Job Description</h2>
+    <!-- Main Content -->
+    <main class="main-content" id="overview">
 
-                    <input type="text" name="title" placeholder="Enter job title..." required>
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div>
+                <p class="breadcrumb">Workspace / Dashboard</p>
+                <h1>Dashboard Overview</h1>
+            </div>
 
-                    <textarea name="description" placeholder="Enter or paste the job description here..."
-                        required></textarea>
+            <div class="system-status">
+                <span class="status-dot"></span>
+                Resume Ranker
+            </div>
+        </header>
 
+        <!-- Welcome Banner -->
+        <section class="welcome-banner">
+            <div class="welcome-content">
+                <span class="eyebrow">SMARTER RECRUITMENT STARTS HERE</span>
+
+                <h2>Welcome to your hiring dashboard</h2>
+
+                <p>
+                    Manage job descriptions, analyze resumes, and discover
+                    candidates whose skills best match your requirements.
+                </p>
+
+                <a href="#add-job" class="banner-button">
+                    + Create a Job
+                </a>
+            </div>
+
+            <div class="banner-art" aria-hidden="true">
+                <div class="art-circle circle-one"></div>
+                <div class="art-circle circle-two"></div>
+
+                <div class="art-document">
+                    <div class="document-avatar"></div>
+                    <div class="document-line line-long"></div>
+                    <div class="document-line"></div>
+                    <div class="document-line line-short"></div>
+                    <div class="document-check">&#10003;</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Statistics -->
+        <section class="stats-grid" aria-label="Dashboard statistics">
+
+            <article class="stat-card stat-purple">
+                <div class="stat-top">
+                    <span class="stat-label">Total Jobs</span>
+                    <span class="stat-icon">&#9633;</span>
                 </div>
 
-                <button type="submit">
-                    Save Job
+                <div class="stat-value">{{ jobs|length }}</div>
+                <p class="stat-description">Job descriptions saved</p>
+            </article>
+
+            <article class="stat-card stat-blue">
+                <div class="stat-top">
+                    <span class="stat-label">Total Candidates</span>
+                    <span class="stat-icon">&#9786;</span>
+                </div>
+
+                <div class="stat-value">{{ candidates|length }}</div>
+                <p class="stat-description">Resumes uploaded</p>
+            </article>
+
+            <article class="stat-card stat-green">
+                <div class="stat-top">
+                    <span class="stat-label">Ranked Candidates</span>
+                    <span class="stat-icon">&#9733;</span>
+                </div>
+
+                <div class="stat-value">{{ ranked_candidates|length }}</div>
+                <p class="stat-description">Results for selected job</p>
+            </article>
+
+            <article class="stat-card stat-orange">
+                <div class="stat-top">
+                    <span class="stat-label">Top Match</span>
+                    <span class="stat-icon">&#8599;</span>
+                </div>
+
+                <div class="stat-value">
+                    {% if ranked_candidates %}
+                        {{ "%.1f"|format(ranked_candidates[0]["matching_score"]) }}%
+                    {% else %}
+                        0.0%
+                    {% endif %}
+                </div>
+
+                <p class="stat-description">Best score for selected job</p>
+            </article>
+
+        </section>
+
+        <!-- Add Job and Upload Resumes -->
+        <section class="workflow-grid">
+
+            <!-- Add Job Description -->
+            <article class="panel" id="add-job">
+                <div class="panel-heading">
+                    <div class="panel-icon icon-purple">01</div>
+
+                    <div>
+                        <h2>Add Job Description</h2>
+                        <p>Define the role and required skills.</p>
+                    </div>
+                </div>
+
+                <form action="/add-job" method="POST" class="app-form">
+
+                    <label for="job-title">Job Title</label>
+
+                    <input
+                        type="text"
+                        id="job-title"
+                        name="title"
+                        placeholder="e.g. Python Developer"
+                        required
+                    >
+
+                    <label for="job-description">Job Description</label>
+
+                    <textarea
+                        id="job-description"
+                        name="description"
+                        rows="5"
+                        placeholder="Enter responsibilities, skills, and qualifications..."
+                        required
+                    ></textarea>
+
+                    <button type="submit" class="primary-button">
+                        Save Job Description
+                        <span>&rarr;</span>
+                    </button>
+
+                </form>
+            </article>
+
+            <!-- Upload Resumes -->
+            <article class="panel" id="upload-resumes">
+                <div class="panel-heading">
+                    <div class="panel-icon icon-blue">02</div>
+
+                    <div>
+                        <h2>Upload Resumes</h2>
+                        <p>Add candidate resumes in PDF format.</p>
+                    </div>
+                </div>
+
+                <form
+                    action="/upload-resumes"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="app-form"
+                >
+
+                    <label for="resume-files">Candidate Resume Files</label>
+
+                    <div class="upload-area">
+                        <div class="upload-icon">&#8593;</div>
+
+                        <strong>Select PDF resumes</strong>
+                        <p>Choose one or multiple PDF files.</p>
+
+                        <input
+                            type="file"
+                            id="resume-files"
+                            name="resumes"
+                            accept=".pdf,application/pdf"
+                            multiple
+                            required
+                        >
+                    </div>
+
+                    <p class="form-hint">
+                        Only PDF files are supported.
+                    </p>
+
+                    <button type="submit" class="primary-button button-blue">
+                        Upload Resumes
+                        <span>&rarr;</span>
+                    </button>
+
+                </form>
+            </article>
+
+        </section>
+
+        <!-- Analyze Resumes -->
+        <section class="panel analyze-panel">
+
+            <div class="panel-heading">
+                <div class="panel-icon icon-green">03</div>
+
+                <div>
+                    <h2>Analyze and Rank</h2>
+                    <p>Select a job to calculate candidate matching scores.</p>
+                </div>
+            </div>
+
+            {% if jobs %}
+
+            <form action="/analyze-resumes" method="POST" class="analyze-form">
+
+                <div class="select-field">
+                    <label for="job_id">Select Job Description</label>
+
+                    <select name="job_id" id="job_id" required>
+                        {% for job in jobs %}
+                        <option
+                            value="{{ job['id'] }}"
+                            {% if job['id'] == selected_job_id %}selected{% endif %}
+                        >
+                            {{ job['title'] }} (ID: {{ job['id'] }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button analyze-button">
+                    Run Resume Analysis
+                    <span>&rarr;</span>
                 </button>
 
             </form>
 
-        </div>
+            {% else %}
 
-        <form action="/upload-resumes" method="POST" enctype="multipart/form-data">
-
-            <div class="card">
-
-                <h2>Upload Resumes</h2>
-
-                <input type="file" name="resumes" multiple accept=".pdf" required>
-
+            <div class="empty-notice">
+                No job descriptions found. Add a job description before
+                analyzing resumes.
             </div>
 
-            <button type="submit">
-                Upload Resumes
-            </button>
+            {% endif %}
 
-        </form>
+        </section>
 
-        <button>
-            Analyze Resumes
-        </button>
+        <!-- Uploaded Candidates -->
+        <section class="panel table-panel" id="uploaded-candidates">
 
-    </div>
+            <div class="section-heading">
+                <div>
+                    <h2>Uploaded Candidates</h2>
+                    <p>All candidate resumes stored in the system.</p>
+                </div>
 
+                <span class="count-badge">
+                    {{ candidates|length }} candidates
+                </span>
+            </div>
 
-    <div class="card">
-        <h2>Uploaded Candidates</h2>
+            {% if candidates %}
 
-        {% if candidates %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Candidate Name</th>
-                    <th>Resume File</th>
-                </tr>
-            </thead>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Candidate Name</th>
+                            <th>Resume File</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
 
-            <tbody>
-                {% for candidate in candidates %}
-                <tr>
-                    <td>{{ candidate["id"] }}</td>
-                    <td>{{ candidate["name"] }}</td>
-                    <td>{{ candidate["resume_filename"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    <tbody>
+                        {% for candidate in candidates %}
+                        <tr>
+                            <td class="muted-cell">
+                                #{{ candidate["id"] }}
+                            </td>
 
-        {% else %}
-        <p>No candidates uploaded yet.</p>
-        {% endif %}
-    </div>
+                            <td>
+                                <div class="candidate-cell">
+                                    <div class="candidate-avatar">
+                                        {{ (candidate["name"] or "?")[:1]|upper }}
+                                    </div>
 
+                                    <strong>{{ candidate["name"] or "Unnamed Candidate" }}</strong>
+                                </div>
+                            </td>
+
+                            <td>{{ candidate["resume_filename"] }}</td>
+
+                            <td>
+                                <span class="status-pill">Uploaded</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-icon">&#9786;</div>
+                <h3>No candidates yet</h3>
+                <p>Upload PDF resumes to see candidates listed here.</p>
+
+                <a href="#upload-resumes" class="text-link">
+                    Upload resumes &rarr;
+                </a>
+            </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- Ranked Candidates -->
+        <section class="panel table-panel" id="ranked-candidates">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Ranked Candidates</h2>
+
+                    <p>
+                        Matching results for Job ID:
+                        <strong>
+                            {{ selected_job_id if selected_job_id else "Not selected" }}
+                        </strong>
+                    </p>
+                </div>
+
+                <span class="count-badge">
+                    {{ ranked_candidates|length }} results
+                </span>
+            </div>
+
+            {% if ranked_candidates %}
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Candidate</th>
+                            <th>Resume</th>
+                            <th>Text Similarity</th>
+                            <th>Skill Score</th>
+                            <th>Overall Score Meter</th>
+                            <th>Matched Skills</th>
+                            <th>Missing Skills</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for result in ranked_candidates %}
+                        {% set score = result["matching_score"]|float %}
+                        {% set score = [0, [score, 100]|min]|max %}
+
+                        <tr>
+                            <!-- Rank -->
+                            <td>
+                                <span class="rank-number">
+                                    {{ loop.index }}
+                                </span>
+                            </td>
+
+                            <!-- Candidate -->
+                            <td>
+                                <div class="candidate-cell">
+                                    <div class="candidate-avatar">
+                                        {{ (result["candidate_name"] or "?")[:1]|upper }}
+                                    </div>
+
+                                    <strong>
+                                        {{ result["candidate_name"] or "Unnamed Candidate" }}
+                                    </strong>
+                                </div>
+                            </td>
+
+                            <!-- Resume -->
+                            <td class="filename-cell">
+                                {{ result["resume_filename"] }}
+                            </td>
+
+                            <!-- Text Similarity -->
+                            <td>
+                                {% if result["text_score"] is defined and result["text_score"] is not none %}
+                                    <div class="component-score">
+                                        <strong>
+                                            {{ "%.2f"|format(result["text_score"]) }}%
+                                        </strong>
+
+                                        <div class="score-track">
+                                            <div
+                                                class="score-fill text-score-fill"
+                                                data-score="{{ result['text_score'] }}"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span class="muted-cell">Re-analyze</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Skill Score -->
+                            <td>
+                                {% if result["skill_score"] is defined and result["skill_score"] is not none %}
+                                    <div class="component-score">
+                                        <strong>
+                                            {{ "%.2f"|format(result["skill_score"]) }}%
+                                        </strong>
+
+                                        <div class="score-track">
+                                            <div
+                                                class="score-fill skill-score-fill"
+                                                data-score="{{ result['skill_score'] }}"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span class="muted-cell">Re-analyze</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Overall Score Speedometer -->
+                            <td>
+                                <div class="overall-meter">
+
+                                    <svg
+                                        class="meter-gauge"
+                                        viewBox="0 0 120 72"
+                                        role="img"
+                                        aria-label="Overall match score {{ '%.1f'|format(score) }} percent"
+                                    >
+                                        <path
+                                            class="meter-track"
+                                            d="M 12 60 A 48 48 0 0 1 108 60"
+                                            pathLength="100"
+                                        />
+
+                                        <path
+                                            class="meter-value {% if score < 40 %}meter-low{% elif score < 70 %}meter-medium{% else %}meter-high{% endif %}"
+                                            d="M 12 60 A 48 48 0 0 1 108 60"
+                                            pathLength="100"
+                                            stroke-dasharray="{{ score }} 100"
+                                        />
+                                    </svg>
+
+                                    <div class="meter-percentage">
+                                        {{ "%.1f"|format(result["matching_score"]) }}%
+                                    </div>
+
+                                    <div class="meter-caption">
+                                        OVERALL MATCH
+                                    </div>
+
+                                </div>
+                            </td>
+
+                            <!-- Matched Skills -->
+                            <td>
+                                <div class="skill-list">
+                                    {% if result["matched_skills"] %}
+                                        {% for skill in result["matched_skills"].split(",") %}
+                                            {% if skill.strip() %}
+                                                <span class="skill-tag skill-matched">
+                                                    {{ skill.strip() }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="muted-cell">None</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Missing Skills -->
+                            <td>
+                                <div class="skill-list">
+                                    {% if result["missing_skills"] %}
+                                        {% for skill in result["missing_skills"].split(",") %}
+                                            {% if skill.strip() %}
+                                                <span class="skill-tag skill-missing">
+                                                    {{ skill.strip() }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="muted-cell">None</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Score Explanation -->
+            <div class="score-explanation">
+                <h3>How the matching score works</h3>
+
+                <p>
+                    <strong>Text similarity contributes 60%</strong>
+                    and <strong>skill matching contributes 40%</strong>
+                    to the overall score.
+                </p>
+
+                <p class="formula-text">
+                    Overall Score = (Text Similarity × 0.60)
+                    + (Skill Score × 0.40)
+                </p>
+
+                <p class="score-note">
+                    Meter colors are visual indicators only. The matching
+                    score and candidate ranking are calculated by the
+                    existing scoring algorithm.
+                </p>
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-icon">&#9734;</div>
+
+                <h3>No ranking results available</h3>
+
+                <p>
+                    Select a job description above and run the analysis
+                    to generate candidate rankings.
+                </p>
+            </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <span>AI-Based Resume Ranker and Job Matching System</span>
+            <span>Built with Flask, Python and SQLite</span>
+        </footer>
+
+    </main>
+</div>
+
+<!-- Progress bar widths -->
+<script>
+    document.querySelectorAll(".score-fill[data-score]").forEach(function (bar) {
+        const score = Number(bar.dataset.score);
+
+        if (Number.isFinite(score)) {
+            bar.style.width =
+                Math.min(100, Math.max(0, score)) + "%";
+        }
+    });
+</script>
 
 </body>
-
 </html>

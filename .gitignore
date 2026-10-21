@@ -1,8 +1,16 @@
+
 venv/
 __pycache__/
 *.pyc
 .env
-uploads/resumes/
-database/*.db
 .vscode/
 .idea/
+
+# Uploaded files
+uploads/resumes/
+uploads/jobs/
+
+# Local database and backups
+database/*.db
+*_backup.*
+**/*_backup.*
